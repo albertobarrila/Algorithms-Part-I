@@ -7,58 +7,58 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BruteCollinearPoints {
-    private final LineSegment[] ls;
+
+    private final LineSegment[] segments;
 
     public BruteCollinearPoints(Point[] points) {
+        checkNullOrRepeatedPoints(points);
 
-        if (points == null) throw new IllegalArgumentException("points are null");
-        int n = points.length;
-        for (int i = 0; i < n; i++) {
-            if (points[i] == null) throw new IllegalArgumentException("points contains null point");
-            for (int j = i + 1; j < n; j++) {
-                if (points[i].compareTo(points[j]) == 0)
-                    throw new IllegalArgumentException("points contains a repeated point");
-            }
-        }
-        Point[] ps = points.clone();
-        Arrays.sort(ps);
-
-        // Brute force
+        Point[] pointsCloned = points.clone();
+        Arrays.sort(pointsCloned);
         List<LineSegment> list = new ArrayList<LineSegment>();
-        for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                for (int k = j + 1; k < n; k++) {
-                    for (int m = k + 1; m < n; m++) {
-                        Point[] p = {
-                                ps[i],
-                                ps[j],
-                                ps[k],
-                                ps[m]
-                        };
-                        double s1 = p[0].slopeTo(p[1]);
-                        double s2 = p[0].slopeTo(p[2]);
-                        if (s1 != s2) continue;
-                        double s3 = p[0].slopeTo(p[3]);
-                        if (s1 == s3) {
-                            Arrays.sort(p);
-                            list.add(new LineSegment(p[0], p[3]));
-                        }
+        int n = pointsCloned.length;
+        for (int p = 0; p < n; p++) {
+            for (int q = p + 1; q < n; q++) {
+                for (int r = q + 1; r < n; r++) {
+                    for (int s = r + 1; s < n; s++) {
+                        double s1 = pointsCloned[p].slopeTo(pointsCloned[q]);
+                        double s2 = pointsCloned[p].slopeTo(pointsCloned[r]);
+                        double s3 = pointsCloned[p].slopeTo(pointsCloned[s]);
+                        if (s1 == s2 && s1 == s3)
+                            list.add(new LineSegment(pointsCloned[p], pointsCloned[s]));
+
                     }
                 }
             }
         }
-        ls = list.toArray(new LineSegment[list.size()]);
+
+        segments = list.toArray(new LineSegment[list.size()]);
     }
 
     public int numberOfSegments() {
-        return ls.length;
+        return segments.length;
     }
 
     public LineSegment[] segments() {
-        return ls.clone();
+        return segments.clone();
+    }
+
+    private void checkNullOrRepeatedPoints(Point[] points) {
+        if (points == null) throw new IllegalArgumentException("Points are null");
+        for (int i = 0; i < points.length; i++) {
+            if (points[i] == null) throw new IllegalArgumentException("One point is null");
+            for (int j = i + 1; j < points.length; j++) {
+                if (points[j] == null)
+                    throw new IllegalArgumentException("One point is null");
+                if (points[i].compareTo(points[j]) == 0)
+                    throw new IllegalArgumentException("There is a duplicate point");
+            }
+
+        }
     }
 
     public static void main(String[] args) {
+        // read the n points from a file
         In in = new In(args[0]);
         int n = in.readInt();
         Point[] points = new Point[n];
@@ -76,6 +76,7 @@ public class BruteCollinearPoints {
             p.draw();
         }
         StdDraw.show();
+
 
         // print and draw the line segments
         BruteCollinearPoints collinear = new BruteCollinearPoints(points);

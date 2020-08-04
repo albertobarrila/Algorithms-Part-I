@@ -61,22 +61,19 @@ public class Point implements Comparable<Point> {
      * @return the slope between this point and the specified point
      */
     public double slopeTo(Point that) {
-        /* YOUR CODE HERE */
-        if ((that.y == this.y) && (that.x == this.x))
+
+        if ((this.y == that.y) && (this.x == that.x))
             return Double.NEGATIVE_INFINITY;
 
-        // vertical
+        // caso verticale
         if (that.x == this.x)
             return Double.POSITIVE_INFINITY;
 
-        // horizontal
+        // caso orizzontale
         if (that.y == this.y)
             return 0;
 
-        double d = that.y - this.y;
-        double n = that.x - this.x;
-
-        return d / n;
+        return (double) (that.y - this.y) / (that.x - this.x);
     }
 
     /**
@@ -92,26 +89,16 @@ public class Point implements Comparable<Point> {
      * argument point
      */
     public int compareTo(Point that) {
-        if (this.y > that.y)
-            return 1;
-        else if (this.y < that.y)
-            return -1;
-        else if (this.x > that.x)
-            return 1;
-        else if (this.x < that.x)
-            return -1;
-        else
+        if (this.y == that.y && this.x == that.x)
             return 0;
-    }
 
+        // il punto è minore
+        if ((this.y < that.y) || (this.y == that.y && this.x < that.x))
+            return -1;
 
-    private class SlopeOrder implements Comparator<Point> {
-        @Override
-        public int compare(Point o1, Point o2) {
-            double d1 = slopeTo(o1);
-            double d2 = slopeTo(o2);
-            return Double.compare(d1, d2);
-        }
+        // il punto è maggiore
+        return 1;
+
     }
 
     /**
@@ -121,9 +108,17 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        return new SlopeOrder();
+        return new ComparatorClass();
     }
 
+
+    private class ComparatorClass implements Comparator<Point> {
+        public int compare(Point p1, Point p2) {
+            double val1 = slopeTo(p1);
+            double val2 = slopeTo(p2);
+            return Double.compare(val1, val2);
+        }
+    }
 
     /**
      * Returns a string representation of this point.
@@ -142,7 +137,7 @@ public class Point implements Comparable<Point> {
      */
     public static void main(String[] args) {
         Point p = new Point(1, 2);
-        Point q = new Point(3, 4);
+        Point q = new Point(5, 6);
         StdOut.println(p.slopeTo(q));
     }
 }
